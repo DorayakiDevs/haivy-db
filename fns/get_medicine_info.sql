@@ -9,10 +9,10 @@ BEGIN
                 'name', m.name,
                 'description', m.description,
                 'is_available', m.is_available,
-                'med_time', m.med_time
+                'consumption_note', m.consumption_note
         ) INTO result
-        FROM medicine m
-        WHERE m.medicine_id = med_id;
+        FROM medicines m
+        WHERE m.id = med_id;
 
         RETURN result;
 -- incase error occurs

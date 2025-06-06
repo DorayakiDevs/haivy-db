@@ -3,28 +3,22 @@ CREATE OR REPLACE FUNCTION update_medication_info(
     med_name varchar,
     med_description text,
     med_availability boolean,
-    med_time medicine_timing
+    med_consumption_note text
 )
 RETURNS VOID AS $$
 DECLARE
-    user_role role_type;
+    user_role role;
 BEGIN
--- take the role from authorized user
-    SELECT s.role
-    FROM staffs s
-    WHERE s.user_id = auth.uid()
-    INTO user_role;
--- restrict operation to admin and manager only
-    IF user_role IS NULL or user_role NOT IN ('admin', 'manager') THEN
+    IF (auth.uid() IS NULL) OR NOT ((SELECT roles FROM user_details WHERE user_id = auth.uid()) @> ARRAY['administrator', 'manager']::role[]) THEN
     RAISE EXCEPTION 'You do not have permission to perform this action';
     END IF;
-    UPDATE Medicine m
+    UPDATE Medicines
     SET 
-        m.name = med_name,
-        m.description = med_description,
-        m.is_available = med_availability,
-        m.med_time = med_time
-    WHERE m.medicine_id = med_id;
+        name = med_name,
+        description = med_description,
+        is_available = med_availability,
+        consumption_note = med_consumption_note
+    WHERE id = med_id;
 --in case something else went wrong
 EXCEPTION
     WHEN OTHERS THEN

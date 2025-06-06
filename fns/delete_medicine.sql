@@ -3,20 +3,14 @@ CREATE OR REPLACE FUNCTION delete_medication(
 )
 RETURNS VOID AS $$
 DECLARE
-    user_role role_type;
+    user_role role;
 BEGIN
--- take the role from authorized user
-    SELECT s.role
-    FROM staffs s
-    WHERE s.user_id = auth.uid()
-    INTO user_role;
--- restrict operation to admin and manager only
-    IF user_role IS NULL or user_role NOT IN ('admin', 'manager') THEN
+    IF (auth.uid() IS NULL) OR NOT ((SELECT roles FROM user_details WHERE user_id = auth.uid()) @> ARRAY['administrator', 'manager']::role[]) THEN
     RAISE EXCEPTION 'You do not have permission to perform this action';
     END IF;
-    UPDATE Medicine m
-    SET m.is_available = FALSE
-    WHERE medicine_id = med_id;
+    UPDATE Medicines
+    SET is_available = FALSE
+    WHERE id = med_id;
 --in case something else went wrong
 EXCEPTION
     WHEN OTHERS THEN

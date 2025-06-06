@@ -2,24 +2,20 @@ CREATE OR REPLACE FUNCTION add_medication(
     med_name varchar,
     med_description text,
     med_availability boolean,
-    med_time medicine_timing
+    med_consumption_note text
 )
 RETURNS VOID AS $$
 DECLARE
-    user_role role_type;
+    temp_user_role role;
 BEGIN
-    SELECT s.role
-    FROM staffs s
-    WHERE s.user_id = auth.uid()
-    INTO user_role;
-    IF user_role IS NULL OR user_role NOT IN ('admin', 'manager') THEN
+    IF (auth.uid() IS NULL) OR NOT ((SELECT roles FROM user_details WHERE user_id = auth.uid()) @> ARRAY['administrator', 'manager']::role[]) THEN
     RAISE EXCEPTION 'You do not have permission to perform this action';
     END IF;
-    INSERT INTO Medicine (
+    INSERT INTO Medicines (
         name, 
         description, 
         is_available, 
-        med_time
+        consumption_note
     )
     VALUES (
         med_name, 
@@ -27,6 +23,7 @@ BEGIN
         med_availability, 
         med_time
     );
+    --eror here
 EXCEPTION
     WHEN OTHERS THEN
         RAISE EXCEPTION 'Something went wrong while trying to add medicine: %', SQLERRM;
