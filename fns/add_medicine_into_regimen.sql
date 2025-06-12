@@ -13,7 +13,7 @@ begin
     -- raise exception 'You do not have permission to perform this action';
     -- end if;
     select check_roles(array['administrator', 'manager']::role[]);
---eheck for valid json
+--check for valid json
     select validate_daily_dosage_schedule(p_daily_dosage_schedule);
 --check if medicine exist
     if not exists (select 1 from mecidicines where id = p_medicine_id)
