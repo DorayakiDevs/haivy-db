@@ -179,12 +179,9 @@ create table RegimenDetail(
 --patient medicine intake history
 create table IntakeHistory(
   intake_id uuid primary key default gen_random_uuid(),
-  patient_uid uuid,
-  prescription_id uuid,
-  foreign key (patient_uid) references Patient(patient_uid),
-  foreign key (prescription_id) references Prescription(prescription_id),
-  take_time timestamptz,
+  user_id uuid,
+  intake_time timestamptz,
   missed boolean,
   note text,
-  remind_inc_appointment boolean
+  created_date timestamptz default (now() AT TIME ZONE 'utc'::text)
 );

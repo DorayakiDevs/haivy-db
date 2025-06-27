@@ -31,7 +31,7 @@ try{
     // This way your row-level-security (RLS) policies are applied.
     {
       global: {
-        headers: { Authorization: req.headers.get('Authorization')! },
+        headers: { Authorization: req.headers.get('Authorization')},
       },
     }
   );
@@ -130,8 +130,8 @@ try{
       status: 200
     }
   );
-}catch(e){
-  let logMes = (e as DOMException).message
+}catch(e:any){
+  let logMes = e.message ?? "uh oh, unknown error";
   //throw error code 500
   return new Response(
     'unhandled error: '+ logMes,
